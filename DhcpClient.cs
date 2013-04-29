@@ -4,15 +4,27 @@ using System.Net.Sockets;
 
 namespace DhcpCheck
 {
-    internal class DhcpClient : IDisposable
+    public class DhcpClientData
     {
         public const int PacketSize = 1024;
+
+        public DhcpClientData()
+        {
+            RemoteEndPoint = new IPEndPoint(IPAddress.Any, 68);
+            _buffer = new byte[PacketSize];
+        }
+
+        public EndPoint RemoteEndPoint;
+        public byte[] Buffer { get { return _buffer; } }
+
+        private readonly byte[] _buffer;
+    }
+
+    internal class DhcpClient : IDisposable
+    {
         private readonly Socket _localSocket;
         private readonly IDhcpPacketReader _packetReader;
         private readonly Parameters _parameters;
-        private EndPoint _dhcpsc;
-        private int _receiveBytes = 0;
-        private readonly byte[] _receiveBuffer = new byte[PacketSize];
 
         public DhcpClient(Parameters parameters, IDhcpPacketReader packetReader)
         {
@@ -26,9 +38,7 @@ namespace DhcpCheck
                     SendTimeout = parameters.SendTimeout,
                     ReceiveTimeout = parameters.ReceiveTimeout
                 };
-
-            _dhcpsc = new IPEndPoint(IPAddress.Any, 68);
-            _localSocket.Bind(_dhcpsc);
+            _localSocket.Bind(new IPEndPoint(IPAddress.Any, 68));
         }
 
         public void Dispose()
@@ -48,18 +58,20 @@ namespace DhcpCheck
 
         internal void BeginReceiveFrom()
         {
-            _localSocket.BeginReceiveFrom(_receiveBuffer, 0, PacketSize, 0, ref _dhcpsc, CheckPacket, _localSocket);
+            var data = new DhcpClientData();
+            _localSocket.BeginReceiveFrom(data.Buffer, 0, DhcpClientData.PacketSize,
+                0, ref data.RemoteEndPoint, CheckPacket, data);
         }
 
         private void CheckPacket(IAsyncResult ar)
         {
-            var remoteSocket = (Socket) ar.AsyncState;
+            var dhcpClientData = (DhcpClientData)ar.AsyncState;
 
             try
             {
-                _receiveBytes = remoteSocket.EndReceiveFrom(ar, ref _dhcpsc);
-                _packetReader.ReadPacket(_receiveBuffer, _receiveBytes);
                 BeginReceiveFrom();
+                int receiveBytes = _localSocket.EndReceiveFrom(ar, ref dhcpClientData.RemoteEndPoint);
+                _packetReader.ReadPacket(dhcpClientData.RemoteEndPoint, dhcpClientData.Buffer, receiveBytes);
             }
             catch (Exception ex)
             {

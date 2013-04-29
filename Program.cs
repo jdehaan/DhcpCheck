@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -14,7 +15,7 @@ namespace DhcpCheck
             _parameters = new Parameters();
         }
 
-        public void ReadPacket(byte[] data, int length)
+        public void ReadPacket(EndPoint remoteEndPoint, byte[] data, int length)
         {
             //Field      DHCPOFFER            
             //-----      ---------            
@@ -113,6 +114,12 @@ namespace DhcpCheck
                             rebindingTime = ReadTimeInterval(binaryReader);
                             break;
 
+                        case 24: // MTU aging, ignore
+                        case 46: // Netbios stuff ignore
+                        case 254: // extensions, ignore
+                            binaryReader.ReadBytes(optionLength);
+                            break;
+
                         default:
                             {
                                 Console.WriteLine("Option {0} not supported yet (length={1})", optionCode, optionLength);
@@ -131,8 +138,8 @@ namespace DhcpCheck
                                                 DateTime.Now);
                     break;
                 case 2:
-                    loggingText = string.Format("{0:yyyyMMdd HHmmss}\tOFFER\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\tDN={7}\tDNS={8}\tGW={9}\r\n",
-                                                DateTime.Now, serverIp, offeredIp,
+                    loggingText = string.Format("{0:yyyyMMdd HHmmss}\tOFFER\t{1}({2})\t{3}\t{4}\t{5}\t{6}\t{7}\tDN={8}\tDNS={9}\tGW={10}\r\n",
+                                                DateTime.Now, serverIp, remoteEndPoint, offeredIp,
                                                 leaseTime, renewalTime, rebindingTime,
                                                 subnetMask,
                                                 domainName, dnsServers, routers);
