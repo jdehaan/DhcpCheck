@@ -9,14 +9,22 @@ namespace DhcpCheck
         public Parameters()
         {
             // Fake mac address
-            // AA-BB-CC-DD-EE-FF
             _macAddress = new byte[6];
-            _macAddress[0] = 0xAA;
-            _macAddress[1] = 0xBB;
-            _macAddress[2] = 0xCC;
-            _macAddress[3] = 0xDD;
-            _macAddress[4] = 0xEE;
-            _macAddress[5] = 0xFF;
+            // use similar fake as DHCP find
+            _macAddress[0] = 0x08;
+            _macAddress[1] = 0x00;
+            _macAddress[2] = 0x27;
+            _macAddress[3] = 0x00;
+            _macAddress[4] = 0xE8;
+            _macAddress[5] = 0x45;
+
+            // AA-BB-CC-DD-EE-FF
+            //_macAddress[0] = 0xAA;
+            //_macAddress[1] = 0xBB;
+            //_macAddress[2] = 0xCC;
+            //_macAddress[3] = 0xDD;
+            //_macAddress[4] = 0xEE;
+            //_macAddress[5] = 0xFF;
         }
 
         public string Logfile
