@@ -7,6 +7,13 @@ This is at the moment a first shot with a quick and rather dirty implementation.
 
 If there is public interest rising up with such a tool I will cleanup and extend the tool.
 
+Prerequisities
+==============
+
+.NET4 must be installed
+
+WinPCap must be installed: get it here http://www.winpcap.org/
+
 
 Licensing
 =========
