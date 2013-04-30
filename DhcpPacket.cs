@@ -97,6 +97,7 @@ namespace DhcpCheck
             string subnetMask = "?";
             string routers = "?";
             string dnsServers = "?";
+            string hostName = "?";
             string domainName = "?";
             byte otype = 0;
 
@@ -136,6 +137,11 @@ namespace DhcpCheck
 
                         case 6:
                             dnsServers = ReadIpv4List(optionLength, binaryReader);
+                            break;
+
+                        case 12:
+                            hostName = Encoding.ASCII.GetString(binaryReader.ReadBytes(optionLength), 0,
+                                                                  optionLength - 1);
                             break;
 
                         case 15:
@@ -211,7 +217,7 @@ namespace DhcpCheck
                     loggingText = string.Format("ACK\t{0:X8}\t{1}\t{2}", xid, ciaddr, yiaddr);
                     break;
                 case 8:
-                    loggingText = string.Format("INFORM\t{0:X8}\t{1}\t{2}", xid, ciaddr, yiaddr);
+                    loggingText = string.Format("INFORM\t{0:X8}\t{1}\t{2}\t{3}", xid, ciaddr, yiaddr, hostName);
                     break;
                 default:
                     Console.WriteLine("Not handled: DHCP message type {0}", otype);
