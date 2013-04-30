@@ -10,9 +10,9 @@ If there is public interest rising up with such a tool I will cleanup and extend
 Prerequisities
 ==============
 
-.NET4 must be installed
+.NET4 must be installed, web installer here: http://www.microsoft.com/en-us/download/details.aspx?id=17851
 
-WinPCap must be installed: get it here http://www.winpcap.org/
+WinPCap must be installed, get it here: http://www.winpcap.org/
 
 
 Licensing
@@ -24,4 +24,6 @@ Code released under BSD 3 Clause license.
 Wireshark settings
 ==================
 
-	bootp.option.type == 53	-> DHCP packets
+**Filter out the Boostrap packets containing DHCP data**
+
+	bootp.option.type == 53
