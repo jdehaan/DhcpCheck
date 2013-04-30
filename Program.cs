@@ -1,19 +1,19 @@
 ﻿using System;
-using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading;
 
 namespace DhcpCheck
 {
-    internal class Program : IDhcpPacketReader
+    internal class Program
     {
+        private readonly DhcpCapture _captureDriver;
         private readonly Parameters _parameters;
         private volatile bool _exit;
 
         private Program()
         {
             _parameters = new Parameters();
+            _captureDriver = new DhcpCapture();
         }
 
         private static void Main(string[] args)
@@ -27,29 +27,25 @@ namespace DhcpCheck
             Console.WriteLine("Press Ctrl+C to exit");
             Console.TreatControlCAsInput = false;
             Console.CancelKeyPress += ConsoleOnCancelKeyPress;
+            _captureDriver.StartCapturing(_parameters);
+
             while (!_exit)
             {
-                using (var dhcpClient = new DhcpClient(_parameters, this))
+                using (var dhcpClient = new DhcpClient(_parameters))
                 {
                     dhcpClient.SendDiscover();
-                    dhcpClient.BeginReceiveFrom();
-                    Thread.Sleep(9900);
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(_parameters.WaitingTime);
             }
-            Console.WriteLine("Ctrl+C pressed, exitting");
+
+            Console.WriteLine("Ctrl+C pressed, exiting...");
+            _captureDriver.StopCapturing();
         }
 
         private void ConsoleOnCancelKeyPress(object sender, ConsoleCancelEventArgs consoleCancelEventArgs)
         {
             _exit = true;
             consoleCancelEventArgs.Cancel = true;
-        }
-
-        public void ReadPacket(EndPoint remoteEndPoint, byte[] data, int length)
-        {
-            var dhcpPacket = new DhcpPacket(data, length);
-            dhcpPacket.ReadPacket(_parameters, remoteEndPoint);
         }
     }
 }

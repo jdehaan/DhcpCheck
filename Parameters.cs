@@ -10,6 +10,7 @@ namespace DhcpCheck
         {
             // Fake mac address
             _macAddress = new byte[6];
+
             // use similar fake as DHCP find
             _macAddress[0] = 0x08;
             _macAddress[1] = 0x00;
@@ -18,7 +19,7 @@ namespace DhcpCheck
             _macAddress[4] = 0xE8;
             _macAddress[5] = 0x45;
 
-            // AA-BB-CC-DD-EE-FF
+            // use a completely fake MAC AA-BB-CC-DD-EE-FF
             //_macAddress[0] = 0xAA;
             //_macAddress[1] = 0xBB;
             //_macAddress[2] = 0xCC;
@@ -29,12 +30,12 @@ namespace DhcpCheck
 
         public string Logfile
         {
-            get { return string.Format("dhcp-{0:yyyyMMdd}.log", DateTime.Now);  }
+            get { return string.Format("dhcp-{0:yyyyMMdd}.log", DateTime.Now); }
         }
 
         public byte[] MacAddress
         {
-            get {  return _macAddress; }
+            get { return _macAddress; }
         }
 
         public int SendTimeout
@@ -45,6 +46,11 @@ namespace DhcpCheck
         public int ReceiveTimeout
         {
             get { return 5*1000; }
+        }
+
+        public int WaitingTime
+        {
+            get { return 10*1000; }
         }
     }
 }

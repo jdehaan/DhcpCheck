@@ -9,17 +9,15 @@ namespace DhcpCheck
     {
         private static readonly Random XidRandom;
         private readonly byte[] _data;
-        private readonly int _length;
 
         static DhcpPacket()
         {
             XidRandom = new Random();
         }
 
-        public DhcpPacket(byte[] data, int length)
+        public DhcpPacket(byte[] data)
         {
             _data = data;
-            _length = length;
         }
 
         public byte[] Data
@@ -27,14 +25,9 @@ namespace DhcpCheck
             get { return _data; }
         }
 
-        public int Length
-        {
-            get { return _length; }
-        }
-
         public static DhcpPacket GenerateDhcpDiscoverPacket(Parameters parameters)
         {
-            var packet = new DhcpPacket(new byte[244], 244);
+            var packet = new DhcpPacket(new byte[244]);
 
             // Generate a Transaction ID for this request
             var xid = new byte[4];
@@ -75,7 +68,7 @@ namespace DhcpCheck
             return packet;
         }
 
-        public void ReadPacket(Parameters parameters, EndPoint remoteEndPoint)
+        public void ReadPacket(Parameters parameters, StringBuilder sb)
         {
             //Field      DHCPOFFER            
             //-----      ---------            
@@ -165,6 +158,7 @@ namespace DhcpCheck
                             //5     DHCPACK
                             //6     DHCPNAK
                             //7     DHCPRELEASE
+                            //8     DHCPINFORM
                             break;
 
                             // DHCP server identifier
@@ -201,32 +195,32 @@ namespace DhcpCheck
             switch (otype)
             {
                 case 1:
-                    loggingText = string.Format("{0:yyyyMMdd HHmmss}\tDSCVR\t{1:X8}\t{2}\r\n",
-                                                DateTime.Now, xid, ciaddr);
+                    loggingText = string.Format("DISCOVER\t{0:X8}\t{1}", xid, ciaddr);
                     break;
                 case 2:
                     loggingText =
                         string.Format(
-                            "{0:yyyyMMdd HHmmss}\tOFFER\t{11:X8}\t{1}({2})\t{3}\t{4}\t{5}\t{6}\t{7}\tDN={8}\tDNS={9}\tGW={10}\r\n",
-                            DateTime.Now, serverIp, remoteEndPoint, yiaddr,
+                            "OFFER\t{0:X8}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\tDN={7}\tDNS={8}\tGW={9}",
+                            xid, serverIp, yiaddr,
                             leaseTime, renewalTime, rebindingTime,
                             subnetMask,
                             domainName, dnsServers, routers,
                             xid);
                     break;
                 case 5:
-                    loggingText = string.Format("{0:yyyyMMdd HHmmss}\tDHCPACK\t{1:X8}\t{2}\t{3}\r\n",
-                                                DateTime.Now, xid, ciaddr, yiaddr);
+                    loggingText = string.Format("ACK\t{0:X8}\t{1}\t{2}", xid, ciaddr, yiaddr);
+                    break;
+                case 8:
+                    loggingText = string.Format("INFORM\t{0:X8}\t{1}\t{2}", xid, ciaddr, yiaddr);
                     break;
                 default:
-                    Console.WriteLine("No handled: DHCP message type {0}", otype);
+                    Console.WriteLine("Not handled: DHCP message type {0}", otype);
                     break;
             }
 
             if (loggingText != null)
             {
-                File.AppendAllText(parameters.Logfile, loggingText);
-                Console.Write(loggingText);
+                sb.Append(loggingText);
             }
         }
 
