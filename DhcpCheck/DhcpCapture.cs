@@ -13,15 +13,15 @@ namespace DhcpCheck
     {
         private readonly Queue<Packet> _packets;
         private readonly Parameters _parameters;
-        //private readonly CaptureFileWriterDevice _pcapFileWriter;
+        private readonly CaptureFileWriterDevice _pcapFileWriter;
         private Thread _writer;
 
         public DhcpCapture(Parameters parameters)
         {
             _parameters = parameters;
             _packets = new Queue<Packet>();
-            //_pcapFileWriter = new CaptureFileWriterDevice(
-            //    LinkLayers.Raw, null, _parameters.PcapFilename, FileMode.OpenOrCreate);
+            _pcapFileWriter = new CaptureFileWriterDevice(
+                LinkLayers.Ethernet, null, _parameters.PcapFilename, FileMode.OpenOrCreate);
         }
 
         public string Version
@@ -138,7 +138,7 @@ namespace DhcpCheck
             var packet = Packet.ParsePacket(LinkLayers.Ethernet, e.Packet.Data) as EthernetPacket;
             if (packet == null)
                 return;
-            //_pcapFileWriter.SendPacket(e.Packet.Data);
+            _pcapFileWriter.Write(e.Packet);
             _packets.Enqueue(packet);
         }
     }
