@@ -140,12 +140,14 @@ namespace DhcpCheck
                             break;
 
                         case 12:
-                            hostName = Encoding.ASCII.GetString(binaryReader.ReadBytes(optionLength), 0,
-                                                                  optionLength - 1);
+                            if (optionLength>0)
+                                hostName = Encoding.ASCII.GetString(binaryReader.ReadBytes(optionLength), 0,
+                                                                  optionLength);
                             break;
 
                         case 15:
-                            domainName = Encoding.ASCII.GetString(binaryReader.ReadBytes(optionLength), 0,
+                            if (optionLength > 0)
+                                domainName = Encoding.ASCII.GetString(binaryReader.ReadBytes(optionLength), 0,
                                                                   optionLength - 1);
                             break;
 

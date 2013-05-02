@@ -4,24 +4,6 @@ using System.Net.Sockets;
 
 namespace DhcpCheck
 {
-    public class DhcpClientData
-    {
-        public const int PacketSize = 1024;
-        private readonly byte[] _buffer;
-
-        public EndPoint RemoteEndPoint;
-
-        public DhcpClientData()
-        {
-            RemoteEndPoint = new IPEndPoint(IPAddress.Any, 68);
-            _buffer = new byte[PacketSize];
-        }
-
-        public byte[] Buffer
-        {
-            get { return _buffer; }
-        }
-    }
 
     internal class DhcpClient : IDisposable
     {
@@ -38,7 +20,6 @@ namespace DhcpCheck
                     SendTimeout = parameters.SendTimeout,
                     ReceiveTimeout = parameters.ReceiveTimeout
                 };
-            _localSocket.Bind(new IPEndPoint(IPAddress.Any, 68));
         }
 
         public void Dispose()

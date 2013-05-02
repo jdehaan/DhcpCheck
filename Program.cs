@@ -13,7 +13,7 @@ namespace DhcpCheck
         private Program()
         {
             _parameters = new Parameters();
-            _captureDriver = new DhcpCapture();
+            _captureDriver = new DhcpCapture(_parameters);
         }
 
         private static void Main(string[] args)
@@ -27,7 +27,7 @@ namespace DhcpCheck
             Console.WriteLine("Press Ctrl+C to exit");
             Console.TreatControlCAsInput = false;
             Console.CancelKeyPress += ConsoleOnCancelKeyPress;
-            _captureDriver.StartCapturing(_parameters);
+            _captureDriver.StartCapturing();
 
             while (!_exit)
             {
