@@ -59,7 +59,7 @@ namespace DhcpCheck
             var ipPacket = ethPacket.Extract(typeof (IPv4Packet)) as IPv4Packet;
             if (ipPacket == null)
                 return;
-            var udpPacket = ipPacket.Extract(typeof (UdpPacket)) as UdpPacket;
+            var udpPacket = ipPacket.Extract    (typeof (UdpPacket)) as UdpPacket;
             if (udpPacket == null)
                 return;
 
