@@ -20,6 +20,7 @@ namespace DhcpCheck
                     SendTimeout = parameters.SendTimeout,
                     ReceiveTimeout = parameters.ReceiveTimeout
                 };
+            _localSocket.Bind(new IPEndPoint(IPAddress.Any, 68));
         }
 
         public void Dispose()
