@@ -140,15 +140,21 @@ namespace DhcpCheck
                             break;
 
                         case 12:
-                            if (optionLength>0)
-                                hostName = Encoding.ASCII.GetString(binaryReader.ReadBytes(optionLength), 0,
-                                                                  optionLength);
+                            if (optionLength > 0)
+                            {
+                                byte[] buffer = binaryReader.ReadBytes(optionLength);
+                                if (buffer.Length != optionLength) Console.WriteLine("WARNING: Could not read all bytes, option 12");
+                                hostName = Encoding.ASCII.GetString(buffer, 0, buffer.Length);
+                            }
                             break;
 
                         case 15:
                             if (optionLength > 0)
-                                domainName = Encoding.ASCII.GetString(binaryReader.ReadBytes(optionLength), 0,
-                                                                  optionLength - 1);
+                            {
+                                byte[] buffer = binaryReader.ReadBytes(optionLength);
+                                if (buffer.Length != optionLength) Console.WriteLine("WARNING: Could not read all bytes, option 15");
+                                domainName = Encoding.ASCII.GetString(buffer, 0, buffer.Length - 1);
+                            }
                             break;
 
                             // lease time

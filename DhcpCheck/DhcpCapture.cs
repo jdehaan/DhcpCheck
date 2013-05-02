@@ -5,19 +5,23 @@ using System.Text;
 using System.Threading;
 using PacketDotNet;
 using SharpPcap;
+using SharpPcap.LibPcap;
 
 namespace DhcpCheck
 {
     public class DhcpCapture
     {
-        private readonly Parameters _parameters;
         private readonly Queue<Packet> _packets;
+        private readonly Parameters _parameters;
+        //private readonly CaptureFileWriterDevice _pcapFileWriter;
         private Thread _writer;
 
         public DhcpCapture(Parameters parameters)
         {
             _parameters = parameters;
             _packets = new Queue<Packet>();
+            //_pcapFileWriter = new CaptureFileWriterDevice(
+            //    LinkLayers.Raw, null, _parameters.PcapFilename, FileMode.OpenOrCreate);
         }
 
         public string Version
@@ -52,10 +56,10 @@ namespace DhcpCheck
             var ethPacket = packet as EthernetPacket;
             if (ethPacket == null)
                 return;
-            var ipPacket = ethPacket.Extract(typeof(IPv4Packet)) as IPv4Packet;
+            var ipPacket = ethPacket.Extract(typeof (IPv4Packet)) as IPv4Packet;
             if (ipPacket == null)
                 return;
-            var udpPacket = ipPacket.Extract(typeof(UdpPacket)) as UdpPacket;
+            var udpPacket = ipPacket.Extract(typeof (UdpPacket)) as UdpPacket;
             if (udpPacket == null)
                 return;
 
@@ -80,7 +84,7 @@ namespace DhcpCheck
             sb.Append("\r\n");
 
             String loggingText = sb.ToString();
-            File.AppendAllText(_parameters.Logfile, loggingText);
+            File.AppendAllText(_parameters.LogFilename, loggingText);
             Console.Write(loggingText);
         }
 
@@ -134,6 +138,7 @@ namespace DhcpCheck
             var packet = Packet.ParsePacket(LinkLayers.Ethernet, e.Packet.Data) as EthernetPacket;
             if (packet == null)
                 return;
+            //_pcapFileWriter.SendPacket(e.Packet.Data);
             _packets.Enqueue(packet);
         }
     }

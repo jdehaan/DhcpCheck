@@ -1,0 +1,3 @@
+[submodule "PacketDotNet"]
+	path = PacketDotNet
+	url = git://git.code.sf.net/p/packetnet/code

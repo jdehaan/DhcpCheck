@@ -28,9 +28,14 @@ namespace DhcpCheck
             //_macAddress[5] = 0xFF;
         }
 
-        public string Logfile
+        public string LogFilename
         {
             get { return string.Format("dhcp-{0:yyyyMMdd}.log", DateTime.Now); }
+        }
+
+        public string PcapFilename
+        {
+            get { return string.Format("dhcp-{0:yyyyMMdd}.pcap", DateTime.Now); }
         }
 
         public byte[] MacAddress
