@@ -37,7 +37,19 @@ namespace DhcpCheck
                 {
                     if (_packets.Count > 0)
                     {
-                        Write(_packets.Dequeue());
+                        try
+                        {
+                            Write(_packets.Dequeue());
+                        }
+                        catch (ThreadInterruptedException)
+                        {
+                            throw; // rethrow this one
+                        }
+                        catch (Exception)
+                        {
+                            // but swallow this one by dumping an error to the console
+                            Console.WriteLine("ERROR: Invalid BOOTP packet received (ignored)!");
+                        }
                     }
                     else
                     {
@@ -59,7 +71,7 @@ namespace DhcpCheck
             var ipPacket = ethPacket.Extract(typeof (IPv4Packet)) as IPv4Packet;
             if (ipPacket == null)
                 return;
-            var udpPacket = ipPacket.Extract    (typeof (UdpPacket)) as UdpPacket;
+            var udpPacket = ipPacket.Extract(typeof (UdpPacket)) as UdpPacket;
             if (udpPacket == null)
                 return;
 
