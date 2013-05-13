@@ -7,18 +7,23 @@ namespace DhcpCheck
 
     internal class DhcpClient : IDisposable
     {
-        private readonly Socket _localSocket;
+        private Socket _localSocket;
         private readonly Parameters _parameters;
 
         public DhcpClient(Parameters parameters)
         {
             _parameters = parameters;
+            CreateSocket();
+        }
+
+        private void CreateSocket()
+        {
             _localSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
                 {
                     EnableBroadcast = true,
                     ExclusiveAddressUse = false,
-                    SendTimeout = parameters.SendTimeout,
-                    ReceiveTimeout = parameters.ReceiveTimeout
+                    SendTimeout = _parameters.SendTimeout,
+                    ReceiveTimeout = _parameters.ReceiveTimeout
                 };
             _localSocket.Bind(new IPEndPoint(IPAddress.Any, 68));
         }
@@ -31,9 +36,24 @@ namespace DhcpCheck
 
         public void SendDiscover()
         {
-            var dhcpcs = new IPEndPoint(IPAddress.Broadcast, 67);
-            DhcpPacket dhcpDiscoverPacket = DhcpPacket.GenerateDhcpDiscoverPacket(_parameters);
-            _localSocket.SendTo(dhcpDiscoverPacket.Data, dhcpcs);
+            try
+            {
+                var dhcpcs = new IPEndPoint(IPAddress.Broadcast, 67);
+                DhcpPacket dhcpDiscoverPacket = DhcpPacket.GenerateDhcpDiscoverPacket(_parameters);
+                _localSocket.SendTo(dhcpDiscoverPacket.Data, dhcpcs);
+            }
+            catch
+            {
+                Rebind();
+                throw;
+            }
+        }
+
+        private void Rebind()
+        {
+            // recreate socket
+            Dispose();
+            CreateSocket();
         }
     }
 }

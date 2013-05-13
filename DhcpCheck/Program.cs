@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 
 namespace DhcpCheck
@@ -33,7 +32,15 @@ namespace DhcpCheck
             {
                 using (var dhcpClient = new DhcpClient(_parameters))
                 {
-                    dhcpClient.SendDiscover();
+                    try
+                    {
+                        dhcpClient.SendDiscover();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Exception during SendDiscover: {0}", ex.Message);
+                        Console.WriteLine("Will retry later...");
+                    }
                 }
                 Thread.Sleep(_parameters.WaitingTime);
             }

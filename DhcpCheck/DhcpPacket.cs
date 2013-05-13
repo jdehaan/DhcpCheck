@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Text;
 
 namespace DhcpCheck
@@ -40,7 +39,7 @@ namespace DhcpCheck
             byte[] macAddress = parameters.MacAddress;
 
             // Actual DHCPDISCOVER packet
-            var data = packet._data;
+            byte[] data = packet._data;
 
             Array.Copy(xid, 0, data, 4, 4);
             Array.Copy(macAddress, 0, data, 28, 6);
@@ -143,7 +142,8 @@ namespace DhcpCheck
                             if (optionLength > 0)
                             {
                                 byte[] buffer = binaryReader.ReadBytes(optionLength);
-                                if (buffer.Length != optionLength) Console.WriteLine("WARNING: Could not read all bytes, option 12");
+                                if (buffer.Length != optionLength)
+                                    Console.WriteLine("WARNING: Could not read all bytes, option 12");
                                 hostName = Encoding.ASCII.GetString(buffer, 0, buffer.Length);
                             }
                             break;
@@ -152,7 +152,8 @@ namespace DhcpCheck
                             if (optionLength > 0)
                             {
                                 byte[] buffer = binaryReader.ReadBytes(optionLength);
-                                if (buffer.Length != optionLength) Console.WriteLine("WARNING: Could not read all bytes, option 15");
+                                if (buffer.Length != optionLength)
+                                    Console.WriteLine("WARNING: Could not read all bytes, option 15");
                                 domainName = Encoding.ASCII.GetString(buffer, 0, buffer.Length - 1);
                             }
                             break;
